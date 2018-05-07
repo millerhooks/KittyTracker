@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from django.utils.text import slugify
 import itertools
 
-__admin__ = ['Cat', 'Feeding', ]
+__admin__ = ['Cat', 'Feeding', 'Medication', 'MedicalRecord']
 
 class Weight:
     MEASURE_CHOICES = (
@@ -161,6 +161,66 @@ class Feeding(models.Model):
             self.created = datetime.datetime.now()
 
         super(Feeding, self).save(*args, **kwargs)
+
+    def __str__(self):
+        if self.cat:
+            cat_name = self.cat.name
+        else:
+            cat_name = "NO CAT NAME"
+        return "{cat}: {timestamp}".format(cat=self.cat.name, timestamp=self.created)
+
+
+class Medication(models.Model):
+    cat = models.ForeignKey(Cat, blank=True, null=True)
+
+    name = models.CharField(max_length=100)
+    duration = models.TextField(blank=True, null=True)
+    frequency = models.CharField(max_length=2)
+    dosage_unit = models.CharField(max_length=2, default=Weight.MILLILITERS)
+    dosage = models.IntegerField(blank=True, null=True)
+
+    notes = models.CharField(max_length=2048, blank=True, null=True)
+
+    created = models.DateTimeField(blank=True, null=True)
+    modified = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Save time Medication object modified and created times
+        self.modified = datetime.datetime.now()
+        if not self.created:
+            self.created = datetime.datetime.now()
+
+        super(Medication, self).save(*args, **kwargs)
+
+    def __str__(self):
+        if self.cat:
+            cat_name = self.cat.name
+        else:
+            cat_name = "NO CAT NAME"
+        return "{cat}: {timestamp}".format(cat=self.cat.name, timestamp=self.created)
+
+
+class MedicalRecord(models.Model):
+    cat = models.ForeignKey(Cat, blank=True, null=True)
+
+    care_given = models.CharField(max_length=100)
+    date = models.DateField(blank=True, null=True)
+    vet_practice = models.CharField(max_length=100)
+    doc_name = models.CharField(max_length=100)
+    follow_up_date = models.DateField(blank=True, null=True)
+
+    notes = models.CharField(max_length=2048, blank=True, null=True)
+
+    created = models.DateTimeField(blank=True, null=True)
+    modified = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Save time Medication object modified and created times
+        self.modified = datetime.datetime.now()
+        if not self.created:
+            self.created = datetime.datetime.now()
+
+        super(MedicalRecord, self).save(*args, **kwargs)
 
     def __str__(self):
         if self.cat:

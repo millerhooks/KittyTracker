@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -20,6 +21,8 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
+    url(r'^api/v1/auth/obtain_token/', obtain_jwt_token),
+    url(r'^api/v1/auth/refresh_token/', refresh_jwt_token),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

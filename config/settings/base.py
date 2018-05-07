@@ -58,7 +58,7 @@ REST_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-   # 'corsheaders',
+    'corsheaders',
 
 ]
 
@@ -75,8 +75,9 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + REST_APPS + LOCAL_APPS
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAdminUser',
+        #'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -95,12 +96,20 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# For allowing external Vuejs client to connect
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080', 'localhost:8081', 'localhost:3000'
+)
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
