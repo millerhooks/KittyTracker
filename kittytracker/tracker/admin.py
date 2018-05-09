@@ -7,16 +7,30 @@ from import_export.admin import ImportExportModelAdmin
 
 from import_export import resources
 
+
+class MedicationResource(resources.ModelResource):
+
+    class Meta:
+        model = tracker_models.Medication
+
+
 class FeedingResource(resources.ModelResource):
 
     class Meta:
         model = tracker_models.Feeding
+
 
 class CatResource(resources.ModelResource):
 
     class Meta:
         model = tracker_models.Cat
 
+
+class MedicationAdmin(ImportExportModelAdmin):
+    search_fields = ['cat__name', 'notes']
+    list_display = ['cat', 'duration', 'notes', 'frequency', 'dosage', 'dosage_unit',
+                    'created', 'modified']
+    resource_class = MedicationResource
 
 
 class FeedingInline(admin.TabularInline):
@@ -47,7 +61,8 @@ class CatAdmin(ImportExportModelAdmin):
 
 __custom_admins__ = {
     'Cat': CatAdmin,
-    'Feeding': FeedingAdmin
+    'Feeding': FeedingAdmin,
+    'Medication': MedicationAdmin,
 }
 
 for model in tracker_models.__admin__:

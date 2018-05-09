@@ -1,4 +1,4 @@
-from .models import Cat, Feeding
+from .models import Cat, Feeding, Medication, MedicalRecord
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
@@ -7,6 +7,7 @@ class CatSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Cat
         fields = (
+            'id',
             'name',
             'slug',
             'reference_id',
@@ -31,9 +32,11 @@ class CatSerializer(serializers.HyperlinkedModelSerializer):
 
 class FeedingSerializer(serializers.HyperlinkedModelSerializer):
     cat = CatSerializer()
+
     class Meta:
         model = Feeding
         fields = (
+            'id',
             'cat',
             'weight_unit_measure',
             'weight_before_food',
@@ -48,3 +51,62 @@ class FeedingSerializer(serializers.HyperlinkedModelSerializer):
             'modified',
             'photo',
         )
+
+
+
+    def create(self, validated_data):
+        cat_data = validated_data.pop('cat')
+        cat_obj = Cat.objects.get(**cat_data)
+        feeding = Feeding.objects.create(cat=cat_obj, **validated_data)
+        return feeding
+
+
+
+
+class MedicationSerializer(serializers.HyperlinkedModelSerializer):
+    cat = CatSerializer()
+
+    class Meta:
+        model = Medication
+        fields = (
+            'id',
+            'cat',
+            'name',
+            'duration',
+            'frequency',
+            'dosage_unit',
+            'dosage',
+            'notes',
+            'created',
+            'modified',
+        )
+
+    def create(self, validated_data):
+        cat_data = validated_data.pop('cat')
+        cat_obj = Cat.objects.get(**cat_data)
+        medication = Medication.objects.create(cat=cat_obj, **validated_data)
+        return medication
+
+
+class MedicalRecordSerializer(serializers.HyperlinkedModelSerializer):
+    cat = CatSerializer()
+
+    class Meta:
+        model = MedicalRecord
+        fields = (
+            'id',
+            'cat',
+            'care_given',
+            'date',
+            'vet_practice',
+            'doc_name',
+            'follow_up_date',
+            'notes',
+        )
+
+    def create(self, validated_data):
+        cat_data = validated_data.pop('cat')
+        cat_obj = Cat.objects.get(**cat_data)
+        medicalrecord = MedicalRecord.objects.create(cat=cat_obj, **validated_data)
+        return medicalrecord
+

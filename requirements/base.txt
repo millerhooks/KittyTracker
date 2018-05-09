@@ -64,3 +64,5 @@ django-import-export==0.6.0
 git+https://github.com/jet-community/django-jet.git@master
 git+https://github.com/millerhooks/django-jsoneditor.git
 django_guardian==1.4.9
+
+django-cors-headers==2.1.0
