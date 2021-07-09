@@ -1,57 +1,50 @@
-from __future__ import unicode_literals
 from django.contrib import admin
-from jsoneditor.forms import JSONEditor
-from django.contrib.postgres.fields import JSONField
-from . import models as tracker_models
-from import_export.admin import ImportExportModelAdmin
-
-from import_export import resources
-
-class FeedingResource(resources.ModelResource):
-
-    class Meta:
-        model = tracker_models.Feeding
-
-class CatResource(resources.ModelResource):
-
-    class Meta:
-        model = tracker_models.Cat
+from . import models
 
 
+class LitterAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+    list_display = ['name', 'created', 'modified']
 
-class FeedingInline(admin.TabularInline):
-    model = tracker_models.Feeding
+
+class MedicationAdmin(admin.ModelAdmin):
+    search_fields = ['cat__name', 'notes']
+    list_display = ['duration', 'notes', 'frequency', 'dosage_guidelines', 'dosage_unit',
+                    'created', 'modified']
+
+
+class CareLogInline(admin.TabularInline):
+    model = models.CareLog
     extra = 1
-    exclude = ['modified']
     readonly_fields = ['created']
 
 
-class FeedingAdmin(ImportExportModelAdmin):
+class CareLogAdmin(admin.ModelAdmin):
     search_fields = ['cat__name', 'amount_of_food_taken', 'notes']
     list_display = ['cat', 'weight_unit_measure', 'weight_before_food', 'food_unit_measure', 'amount_of_food_taken',
                     'food_type', 'weight_after_food', 'stimulated', 'stimulation_type', 'notes', 'photo',
-                    'created', 'modified']
-    resource_class = FeedingResource
+                    'created']
 
 
-class CatAdmin(ImportExportModelAdmin):
+class CatAdmin(admin.ModelAdmin):
     search_fields = ['name', 'reference_id', 'short_name', 'gender', 'notes']
-    list_display = ['name', 'reference_id', 'short_name', 'gender', 'weight_unit', 'weight', 'notes', 'birthday', 'photo',
-                    'alert_feeder', 'critical_notes', 'first_weight_loss', 'second_weight_loss', 'third_weight_loss',
-                    'many_weight_losses', 'created', 'modified']
+    list_display = ['name', 'slug', 'gender', 'weight', 'weight_unit',
+                    'birthday', 'first_weight_loss', 'second_weight_loss',
+                    'third_weight_loss', 'many_weight_losses', 'created', 'modified']
     inlines = [
-        FeedingInline
+        CareLogInline
     ]
-    resource_class = CatResource
 
 
 __custom_admins__ = {
     'Cat': CatAdmin,
-    'Feeding': FeedingAdmin
+    'CareLog': CareLogAdmin,
+    'Medication': MedicationAdmin,
+    'Litter': LitterAdmin,
 }
 
-for model in tracker_models.__admin__:
-    params = [getattr(tracker_models, model)]
+for model in models.__admin__:
+    params = [getattr(models, model)]
     if model in __custom_admins__:
         params.append(__custom_admins__[model])
     else:
@@ -61,3 +54,5 @@ for model in tracker_models.__admin__:
 
 admin.site.site_title = 'KittyTracker Admin'
 admin.site.site_header = 'KittyTracker Admin'
+
+

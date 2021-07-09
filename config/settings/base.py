@@ -8,9 +8,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/dev/ref/settings/
 """
 import environ
+import os
 
 ROOT_DIR = environ.Path(__file__) - 3  # (kittytracker/config/settings/base.py - 3 = kittytracker/)
 APPS_DIR = ROOT_DIR.path('kittytracker')
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Load operating system environment variables and then prepare to use them
 env = environ.Env()
@@ -44,6 +48,7 @@ DJANGO_APPS = [
     # Admin
     'jet',
     'django.contrib.admin',
+    'webpack_loader',
 ]
 THIRD_PARTY_APPS = [
     'crispy_forms',  # Form layouts
@@ -52,13 +57,19 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',  # registration
     'import_export',
     'oauth2_provider',
+    'guardian',
+    'reversion',
+    'graphene_django',
+    'django_autoslugfield',
+    'bootstrapform',
+    'bootstrap4_datetime',
 ]
 
 REST_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-   # 'corsheaders',
+    'corsheaders',
 
 ]
 
@@ -73,10 +84,20 @@ LOCAL_APPS = [
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + REST_APPS + LOCAL_APPS
 
+GRAPHENE = {
+    'SCHEMA': 'kittytracker.schema.schema',
+    'MIDDLEWARE': (
+        'graphene_django.debug.DjangoDebugMiddleware',
+    )
+}
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAdminUser',
+        #'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -95,12 +116,20 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# For allowing external Vuejs client to connect
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8000', 'localhost:8080', 'localhost:8081', 'localhost:3000', 'https://kittytracker.herokuapp.com/'
+)
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -140,7 +169,7 @@ MANAGERS = ADMINS
 # Uses django-environ to accept uri format
 # See: https://django-environ.readthedocs.io/en/latest/#supported-types
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///kittytracker'),
+    'default': env.db('DATABASE_URL', default='postgres://kittytracker:password@postgres:5432/kittytracker'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -178,6 +207,7 @@ TEMPLATES = [
         # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         'DIRS': [
             str(APPS_DIR.path('templates')),
+            os.path.join(BASE_DIR, '../../src'),
         ],
         'OPTIONS': {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
@@ -214,11 +244,25 @@ STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
+# STATIC_URL = '/public/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [
     str(APPS_DIR.path('static')),
+    # os.path.join(BASE_DIR, '../public'),
+    # str(ROOT_DIR.path('dist')),
 ]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': '',
+        'STATS_FILE': str(ROOT_DIR.path('webpack-stats.json')),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
@@ -232,7 +276,7 @@ STATICFILES_FINDERS = [
 MEDIA_ROOT = str(APPS_DIR('media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 
 # URL Configuration
 # ------------------------------------------------------------------------------
@@ -276,12 +320,14 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
 ]
 
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+#ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
 ACCOUNT_ADAPTER = 'kittytracker.users.adapters.AccountAdapter'

@@ -1,0 +1,5 @@
+<<<<<<< HEAD
+{"status":"compiling","publicPath":"/static/","error":"ModuleNotFoundError","message":"Module not found: Error: Can't resolve 'src/components/Cards/ChartCard.vue' in '/Users/aleph/projects/millerstuff/KittyTracker/src/pages/Dashboard/Dashboard'"}
+=======
+{"status":"done","publicPath":"/static/","chunks":{"null":[{"name":"18.bundle.js","publicPath":"/static/18.bundle.js","path":"/home/miller/Projects/KittyTracker/staticfiles/18.bundle.js"}],"main":[{"name":"bundle.js","publicPath":"/static/bundle.js","path":"/home/miller/Projects/KittyTracker/staticfiles/bundle.js"}]}}
+>>>>>>> e951598a1fb4c52b3bc2e1afb9b303517e78578a

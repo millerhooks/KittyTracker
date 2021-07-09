@@ -1,10 +1,31 @@
-version: '2'
+version: '3'
 
 volumes:
   postgres_data_local: {}
   postgres_backup_local: {}
 
 services:
+#  web:
+#    build:
+#      context: .
+#      dockerfile: ./compose/local/django/Dockerfile (MAKE A SPECIFIC DOCKERFILE FOR THIS WEB SECTION. FOR FRONT-END)
+#    command: npm run dev
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#    volumes:
+#      - .:/app
+#      - /app/node_modules
+#    environment:
+#      - USE_DOCKER=yes
+#      - DATABASE_URL=postgres://kittytracker:password@postgres:5432/kittytracker
+#      - POSTGRES_PASSWORD=password
+#      - POSTGRES_USER=kittytracker
+#      - POSTGRES_HOST=postgres
+#      - POSTGRES_PORT=5432
+#      - POSTGRES_DB=kittytracker
+
   django:
     build:
       context: .
@@ -14,18 +35,31 @@ services:
     volumes:
       - .:/app
     environment:
-      - POSTGRES_USER=kittytracker
       - USE_DOCKER=yes
+      - DATABASE_URL=postgres://kittytracker:password@postgres:5432/kittytracker
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=kittytracker
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=kittytracker
     ports:
       - "8000:8000"
-    command: /start.sh
+#    command: /start.sh
+    working_dir: /app
+    command: python manage.py runserver_plus 0.0.0.0:8000
+    restart: always
 
   postgres:
     image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=kittytracker
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=kittytracker
     volumes:
       - ${PWD}/.db/kittytracker/postgres:/var/lib/postgresql/data
       - ${PWD}/.db/kittytracker/postgres-backups:/backups
-    environment:
-      - POSTGRES_USER=kittytracker
+
 
 

@@ -32,6 +32,10 @@ Starting The Application
 
     $ docker-compose up
 
+* To run the FRONT-END, you MUST (this updates staticfiles dir upon the webrowser)
+
+    $ npm run dev
+
 Setting Up Your Users
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -100,6 +104,4 @@ Docker
 See detailed `cookiecutter-django Docker documentation`_.
 
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
-
-
 

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block page_name %}Medications{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for medication in object_list %}
+            <li>{{ medication.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

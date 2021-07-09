@@ -43,12 +43,12 @@ CACHES = {
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
-INSTALLED_APPS += ['debug_toolbar', ]
+# MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+# INSTALLED_APPS += ['debug_toolbar', ]
 
 INTERNAL_IPS = ['127.0.0.1', '10.0.2.2', '192.168.1.108', '192.168.1.*', '192.168.1.186', 'localhost']
 
-ALLOWED_HOSTS = ['192.168.1.108', '192.168.1.*', '192.168.1.186', 'localhost']
+ALLOWED_HOSTS = ['192.168.1.108', '192.168.1.*', '192.168.1.186', 'localhost', '0.0.0.0']
 import socket
 import os
 # tricks to have debug toolbar when developing with docker
